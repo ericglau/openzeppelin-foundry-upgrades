@@ -22,6 +22,9 @@ import {ValidateAndUpgrade} from "./internal/ValidateAndUpgrade.sol";
 
 /**
  * @dev Library for deploying and managing upgradeable contracts from Forge scripts or tests.
+ *
+ * @notice Requires OpenZeppelin Contracts v5 and above.
+ * If you are using OpenZeppelin Contracts v4, use LegacyUpgrades.sol instead.
  */
 library Upgrades {
     /**

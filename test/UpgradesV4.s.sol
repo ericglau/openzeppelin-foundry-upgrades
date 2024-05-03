@@ -8,7 +8,7 @@ import {GreeterProxiable} from "./contracts/GreeterProxiable.sol";
 import {GreeterV2} from "./contracts/GreeterV2.sol";
 import {GreeterV2Proxiable} from "./contracts/GreeterV2Proxiable.sol";
 
-import {UpgradesV4} from "../src-v4/UpgradesV4.sol";
+import {LegacyUpgrades} from "../src/LegacyUpgrades.sol";
 import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
@@ -45,7 +45,7 @@ contract UpgradesV4Script is Script {
         address impl = address(new Greeter());
         address beacon = address(new UpgradeableBeacon(impl));
         new BeaconProxy(beacon, abi.encodeCall(Greeter.initialize, ("hello")));
-        UpgradesV4.upgradeBeacon(beacon, "GreeterV2.sol");
+        LegacyUpgrades.upgradeBeacon(beacon, "GreeterV2.sol");
 
         vm.stopBroadcast();
     }

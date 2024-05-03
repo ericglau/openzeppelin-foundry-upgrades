@@ -11,9 +11,11 @@ import {IProxyAdmin} from "../src/internal/interfaces/IProxyAdmin.sol";
 import {ValidateAndUpgrade} from "../src/internal/ValidateAndUpgrade.sol";
 
 /**
- * @dev Library for deploying and managing upgradeable contracts from Forge scripts or tests.
+ * @dev Library for managing upgradeable contracts from Forge scripts or tests.
+ *
+ * @notice Supports upgrading existing deployments from OpenZeppelin Contracts v4.
  */
-library UpgradesV4 {
+library LegacyUpgrades {
     /**
      * @dev Upgrades a proxy to a new implementation contract. Only supported for UUPS or transparent proxies.
      *
