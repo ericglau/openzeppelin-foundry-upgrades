@@ -13,7 +13,7 @@ contract GreeterV2 is Initializable, OwnableUpgradeable {
 
     string public greeting;
 
-    function initialize(address initialOwner, string memory _greeting) initializer public {
+    function initialize(address initialOwner, string memory _greeting) public initializer {
         __Ownable_init(initialOwner);
         greeting = _greeting;
     }

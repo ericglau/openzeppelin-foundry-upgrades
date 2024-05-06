@@ -16,17 +16,13 @@ contract GreeterV2Proxiable is Initializable, OwnableUpgradeable, UUPSUpgradeabl
 
     string public greeting;
 
-    function initialize(address initialOwner, string memory _greeting) initializer public {
+    function initialize(address initialOwner, string memory _greeting) public initializer {
         __Ownable_init(initialOwner);
         __UUPSUpgradeable_init();
         greeting = _greeting;
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyOwner
-        override
-    {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function resetGreeting() public reinitializer(2) {
         greeting = "resetted";

@@ -40,7 +40,13 @@ contract UpgradesUseDefenderDeployTest is Test {
         Options memory opts;
         opts.defender.useDefenderDeploy = true;
 
-        try d.deployUUPSProxy("GreeterProxiable.sol", abi.encodeCall(GreeterProxiable.initialize, (msg.sender, "hello")), opts) {
+        try
+            d.deployUUPSProxy(
+                "GreeterProxiable.sol",
+                abi.encodeCall(GreeterProxiable.initialize, (msg.sender, "hello")),
+                opts
+            )
+        {
             fail();
         } catch Error(string memory reason) {
             strings.slice memory slice = reason.toSlice();
@@ -53,7 +59,14 @@ contract UpgradesUseDefenderDeployTest is Test {
         Options memory opts;
         opts.defender.useDefenderDeploy = true;
 
-        try d.deployTransparentProxy("Greeter.sol", msg.sender, abi.encodeCall(Greeter.initialize, (msg.sender, "hello")), opts) {
+        try
+            d.deployTransparentProxy(
+                "Greeter.sol",
+                msg.sender,
+                abi.encodeCall(Greeter.initialize, (msg.sender, "hello")),
+                opts
+            )
+        {
             fail();
         } catch Error(string memory reason) {
             strings.slice memory slice = reason.toSlice();
@@ -63,7 +76,10 @@ contract UpgradesUseDefenderDeployTest is Test {
     }
 
     function testUpgradeProxy() public {
-        address proxy = Upgrades.deployUUPSProxy("GreeterProxiable.sol", abi.encodeCall(Greeter.initialize, (msg.sender, "hello")));
+        address proxy = Upgrades.deployUUPSProxy(
+            "GreeterProxiable.sol",
+            abi.encodeCall(Greeter.initialize, (msg.sender, "hello"))
+        );
 
         Options memory opts;
         opts.defender.useDefenderDeploy = true;
