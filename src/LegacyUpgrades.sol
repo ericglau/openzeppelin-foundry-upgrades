@@ -2,12 +2,6 @@
 pragma solidity ^0.8.20;
 
 import {Options} from "../src/Options.sol";
-import {Versions} from "../src/internal/Versions.sol";
-import {Utils} from "../src/internal/Utils.sol";
-import {DefenderDeploy} from "../src/internal/DefenderDeploy.sol";
-import {IUpgradeableProxy} from "../src/internal/interfaces/IUpgradeableProxy.sol";
-import {IProxyAdmin} from "../src/internal/interfaces/IProxyAdmin.sol";
-
 import {ValidateAndUpgrade} from "../src/internal/ValidateAndUpgrade.sol";
 
 /**
