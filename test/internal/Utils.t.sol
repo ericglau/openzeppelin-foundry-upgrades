@@ -17,7 +17,7 @@ contract UtilsTest is Test {
         assertEq(info.contractPath, "test/contracts/Greeter.sol");
 
         assertEq(info.license, "MIT");
-        assertEq(info.sourceCodeHash, "0x4ef1d0c0423b13e6926a902ce4376f18a3333cb55e1423e3bcf4add9902429c3"); // source code hash of Greeter.sol
+        assertEq(info.sourceCodeHash, "0x9564e0245350d0eb5e42a8fed97d87518dbfbddf7668ed383f97a8558b2a9c39"); // source code hash of Greeter.sol
     }
 
     function testGetContractInfo_from_fileAndName() public view {
