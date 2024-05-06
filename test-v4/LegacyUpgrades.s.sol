@@ -31,25 +31,29 @@ contract LegacyUpgradesScript is Script {
         address greeter = LegacyUpgrades.deployImplementation("Greeter.sol", opts);
         address greeterProxiable = LegacyUpgrades.deployImplementation("GreeterProxiable.sol", opts);
 
-        // example deployment and upgrade of a transparent proxy
+        // deploy each type of proxy for testing
         address proxyAdmin = address(new ProxyAdmin());
         address transparentProxy = address(new TransparentUpgradeableProxy(greeter, proxyAdmin, abi.encodeCall(Greeter.initialize, ("hello"))));
-        LegacyUpgrades.upgradeProxy(transparentProxy, "GreeterV2.sol", abi.encodeCall(GreeterV2.resetGreeting, ()));
 
-        // example deployment and upgrade of a UUPS proxy
         address uupsProxy = address(new ERC1967Proxy(
             greeterProxiable,
             abi.encodeCall(GreeterProxiable.initialize, ("hello"))
         ));
+
+        address beacon = address(new UpgradeableBeacon(greeter));
+        new BeaconProxy(beacon, abi.encodeCall(Greeter.initialize, ("hello")));
+
+        // example upgrade of an existing transparent proxy
+        LegacyUpgrades.upgradeProxy(transparentProxy, "GreeterV2.sol", abi.encodeCall(GreeterV2.resetGreeting, ()));
+
+        // example upgrade of an existing UUPS proxy
         LegacyUpgrades.upgradeProxy(
             uupsProxy,
             "GreeterV2Proxiable.sol",
             abi.encodeCall(GreeterV2Proxiable.resetGreeting, ())
         );
 
-        // example deployment of a beacon proxy and upgrade of the beacon
-        address beacon = address(new UpgradeableBeacon(greeter));
-        new BeaconProxy(beacon, abi.encodeCall(Greeter.initialize, ("hello")));
+        // example upgrade of an existing beacon
         LegacyUpgrades.upgradeBeacon(beacon, "GreeterV2.sol");
 
         vm.stopBroadcast();
