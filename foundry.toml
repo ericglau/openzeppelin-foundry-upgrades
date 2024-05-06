@@ -8,4 +8,4 @@ extra_output = ["storageLayout"]
 [profile.openzeppelin-contracts-v4]
 src = "src-v4"
 test = "test-v4"
-remappings = [ "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts-v4" ]
+remappings = [ "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts-v4", "@openzeppelin/contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable-v4" ]
