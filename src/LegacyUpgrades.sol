@@ -1,15 +1,103 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
-import {Options} from "../src/Options.sol";
-import {Core} from "../src/internal/Core.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+
+import {Options} from "./Options.sol";
+import {Core} from "./internal/Core.sol";
 
 /**
- * @dev Library for managing upgradeable contracts from Forge scripts or tests.
+ * @dev Library for deploying and managing upgradeable contracts from Forge scripts or tests.
  *
- * @notice Compatible with legacy deployments that use OpenZeppelin Contracts v4.
+ * @notice Requires OpenZeppelin Contracts v5 or above.
  */
 library Upgrades {
+    /**
+     * @dev Deploys a UUPS proxy using the given contract as the implementation.
+     *
+     * @param contractName Name of the contract to use as the implementation, e.g. "MyContract.sol" or "MyContract.sol:MyContract" or artifact path relative to the project root directory
+     * @param initializerData Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @param opts Common options
+     * @return Proxy address
+     */
+    function deployUUPSProxy(
+        string memory contractName,
+        bytes memory initializerData,
+        Options memory opts
+    ) internal returns (address) {
+        address impl = deployImplementation(contractName, opts);
+
+        return Core.deploy("ERC1967Proxy.sol:ERC1967Proxy", abi.encode(impl, initializerData), opts);
+    }
+
+    /**
+     * @dev Deploys a UUPS proxy using the given contract as the implementation.
+     *
+     * @param contractName Name of the contract to use as the implementation, e.g. "MyContract.sol" or "MyContract.sol:MyContract" or artifact path relative to the project root directory
+     * @param initializerData Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @return Proxy address
+     */
+    function deployUUPSProxy(string memory contractName, bytes memory initializerData) internal returns (address) {
+        Options memory opts;
+        return deployUUPSProxy(contractName, initializerData, opts);
+    }
+
+    /**
+     * @dev Deploys a transparent proxy using the given contract as the implementation.
+     *
+     * @param contractName Name of the contract to use as the implementation, e.g. "MyContract.sol" or "MyContract.sol:MyContract" or artifact path relative to the project root directory
+     * @param proxyAdmin Address of the ProxyAdmin contract that will have permission to upgrade the proxy
+     * @param initializerData Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @param opts Common options
+     * @return Proxy address
+     */
+    function deployTransparentProxy(
+        string memory contractName,
+        address proxyAdmin,
+        bytes memory initializerData,
+        Options memory opts
+    ) internal returns (address) {
+        address impl = deployImplementation(contractName, opts);
+
+        return
+            Core.deploy(
+                "TransparentUpgradeableProxy.sol:TransparentUpgradeableProxy",
+                abi.encode(impl, proxyAdmin, initializerData),
+                opts
+            );
+    }
+
+    /**
+     * @dev Deploys a transparent proxy using the given contract as the implementation.
+     *
+     * @param contractName Name of the contract to use as the implementation, e.g. "MyContract.sol" or "MyContract.sol:MyContract" or artifact path relative to the project root directory
+     * @param proxyAdmin Address of the ProxyAdmin contract that will have permission to upgrade the proxy
+     * @param initializerData Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @return Proxy address
+     */
+    function deployTransparentProxy(
+        string memory contractName,
+        address proxyAdmin,
+        bytes memory initializerData
+    ) internal returns (address) {
+        Options memory opts;
+        return deployTransparentProxy(contractName, proxyAdmin, initializerData, opts);
+    }
+
+    /**
+     * @dev Deploys a ProxyAdmin contract.
+     * 
+     * @param opts Common options
+     * @return ProxyAdmin address
+     */
+    function deployProxyAdmin(Options memory opts) internal returns (address) {
+        return Core.deploy("ProxyAdmin.sol:ProxyAdmin", "", opts);
+    }
+
     /**
      * @dev Upgrades a proxy to a new implementation contract. Only supported for UUPS or transparent proxies.
      *
@@ -85,6 +173,35 @@ library Upgrades {
     }
 
     /**
+     * @dev Deploys an upgradeable beacon using the given contract as the implementation.
+     *
+     * @param contractName Name of the contract to use as the implementation, e.g. "MyContract.sol" or "MyContract.sol:MyContract" or artifact path relative to the project root directory
+     * @param opts Common options
+     * @return Beacon address
+     */
+    function deployBeacon(
+        string memory contractName,
+        Options memory opts
+    ) internal returns (address) {
+        address impl = deployImplementation(contractName, opts);
+
+        return Core.deploy("UpgradeableBeacon.sol:UpgradeableBeacon", abi.encode(impl), opts);
+    }
+
+    /**
+     * @dev Deploys an upgradeable beacon using the given contract as the implementation.
+     *
+     * @param contractName Name of the contract to use as the implementation, e.g. "MyContract.sol" or "MyContract.sol:MyContract" or artifact path relative to the project root directory
+     * @return Beacon address
+     */
+    function deployBeacon(string memory contractName) internal returns (address) {
+        Options memory opts;
+        return deployBeacon(contractName, opts);
+    }
+
+    // TODO deployBeacon with tryCaller
+
+    /**
      * @dev Upgrades a beacon to a new implementation contract.
      *
      * Requires that either the `referenceContract` option is set, or the new implementation contract has a `@custom:oz-upgrades-from <reference>` annotation.
@@ -151,6 +268,30 @@ library Upgrades {
     function upgradeBeacon(address beacon, string memory contractName, address tryCaller) internal {
         Options memory opts;
         Core.upgradeBeacon(beacon, contractName, opts, tryCaller);
+    }
+
+    /**
+     * @dev Deploys a beacon proxy using the given beacon and call data.
+     *
+     * @param beacon Address of the beacon to use
+     * @param data Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @return Proxy address
+     */
+    function deployBeaconProxy(address beacon, bytes memory data) internal returns (address) {
+        Options memory opts;
+        return deployBeaconProxy(beacon, data, opts);
+    }
+
+    /**
+     * @dev Deploys a beacon proxy using the given beacon and call data.
+     *
+     * @param beacon Address of the beacon to use
+     * @param data Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @param opts Common options
+     * @return Proxy address
+     */
+    function deployBeaconProxy(address beacon, bytes memory data, Options memory opts) internal returns (address) {
+        return Core.deploy("BeaconProxy.sol:BeaconProxy", abi.encode(beacon, data), opts);
     }
 
     /**
@@ -234,7 +375,7 @@ library Upgrades {
 }
 
 /**
- * @dev Library for managing upgradeable contracts from Forge tests, without validations.
+ * @dev Library for deploying and managing upgradeable contracts from Forge tests, without validations.
  *
  * Can be used with `forge coverage`. Requires implementation contracts to be instantiated first.
  * Does not require `--ffi` and does not require a clean compilation before each run.
@@ -245,9 +386,36 @@ library Upgrades {
  * `UnsafeUpgrades` does not validate whether your contracts are upgrade safe or whether new implementations are compatible with previous ones.
  * Use `Upgrades` if you want validations to be run.
  *
- * @notice Compatible with legacy deployments that use OpenZeppelin Contracts v4.
+ * @notice Requires OpenZeppelin Contracts v5 or above.
  */
 library UnsafeUpgrades {
+    /**
+     * @dev Deploys a UUPS proxy using the given contract address as the implementation.
+     *
+     * @param impl Address of the contract to use as the implementation
+     * @param initializerData Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @return Proxy address
+     */
+    function deployUUPSProxy(address impl, bytes memory initializerData) internal returns (address) {
+        return address(new ERC1967Proxy(impl, initializerData));
+    }
+
+    /**
+     * @dev Deploys a transparent proxy using the given contract address as the implementation.
+     *
+     * @param impl Address of the contract to use as the implementation
+     * @param initialOwner Address to set as the owner of the ProxyAdmin contract which gets deployed by the proxy
+     * @param initializerData Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @return Proxy address
+     */
+    function deployTransparentProxy(
+        address impl,
+        address initialOwner,
+        bytes memory initializerData
+    ) internal returns (address) {
+        return address(new TransparentUpgradeableProxy(impl, initialOwner, initializerData));
+    }
+
     /**
      * @dev Upgrades a proxy to a new implementation contract address. Only supported for UUPS or transparent proxies.
      *
@@ -277,6 +445,17 @@ library UnsafeUpgrades {
     }
 
     /**
+     * @dev Deploys an upgradeable beacon using the given contract address as the implementation.
+     *
+     * @param impl Address of the contract to use as the implementation
+     * @param initialOwner Address to set as the owner of the UpgradeableBeacon contract which gets deployed
+     * @return Beacon address
+     */
+    function deployBeacon(address impl, address initialOwner) internal returns (address) {
+        return address(new UpgradeableBeacon(impl, initialOwner));
+    }
+
+    /**
      * @dev Upgrades a beacon to a new implementation contract address.
      *
      * @param beacon Address of the beacon to upgrade
@@ -300,6 +479,17 @@ library UnsafeUpgrades {
      */
     function upgradeBeacon(address beacon, address newImpl, address tryCaller) internal {
         Core.upgradeBeaconTo(beacon, newImpl, tryCaller);
+    }
+
+    /**
+     * @dev Deploys a beacon proxy using the given beacon and call data.
+     *
+     * @param beacon Address of the beacon to use
+     * @param data Encoded call data of the initializer function to call during creation of the proxy, or empty if no initialization is required
+     * @return Proxy address
+     */
+    function deployBeaconProxy(address beacon, bytes memory data) internal returns (address) {
+        return address(new BeaconProxy(beacon, data));
     }
 
     /**
