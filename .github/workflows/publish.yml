@@ -45,6 +45,7 @@ jobs:
       - name: Publish to Soldeer
         if: steps.changesets.outputs.published == 'true'
         run: |
+          mkdir -p ~/.soldeer
           echo "$SOLDEER_TOKEN" > ~/.soldeer/.soldeer_login
           PACKAGE_VERSION=$(jq -r .version package.json)
           soldeer publish test-project-ignore~$PACKAGE_VERSION
