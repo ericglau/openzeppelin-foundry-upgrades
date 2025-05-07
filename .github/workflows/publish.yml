@@ -48,7 +48,7 @@ jobs:
           mkdir -p ~/.soldeer
           echo "$SOLDEER_TOKEN" > ~/.soldeer/.soldeer_login
           PACKAGE_VERSION=$(jq -r .version package.json)
-          soldeer publish test-project-ignore~$PACKAGE_VERSION
+          forge soldeer publish test-project-ignore~$PACKAGE_VERSION
         shell: bash
         env:
           SOLDEER_TOKEN: ${{ secrets.SOLDEER_TOKEN }}
