@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 /**
- * Common options. TEST1
+ * Common options. TEST2
  */
 struct Options {
     /*
