@@ -26,8 +26,8 @@ jobs:
         with:
           title: Prepare Release
           commit: Prepare Release
-          version: npm run version
-          publish: npm run publish
+          version: npm run version-package
+          publish: npm run publish-package
           commitMode: github-api
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
