@@ -42,3 +42,12 @@ jobs:
         run: |
           echo "Publish failed. Check the logs for more details."
           exit 1
+      - name: Publish to Soldeer
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          echo "$SOLDEER_TOKEN" > ~/.soldeer/.soldeer_login
+          PACKAGE_VERSION=$(jq -r .version package.json)
+          soldeer publish test-project-ignore~$PACKAGE_VERSION
+        shell: bash
+        env:
+          SOLDEER_TOKEN: ${{ secrets.SOLDEER_TOKEN }}
