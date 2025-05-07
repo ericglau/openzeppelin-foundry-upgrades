@@ -1,5 +1,5 @@
 {
-  "name": "@openzeppelin/foundry-upgrades",
+  "name": "@ericglau/foundry-upgrades",
   "version": "0.4.0",
   "description": "Foundry library for deploying and managing upgradeable contracts",
   "license": "MIT",
