@@ -1,10 +1,16 @@
 # Changelog
 
+
+## 0.4.1 (2025-05-07)
+
+- test change doc ([#1](https://github.com/ericglau/openzeppelin-foundry-upgrades/pull/1))
+
 ## 0.4.0 (2025-01-27)
 
 - Remove dependency on `solidity-stringutils`. ([#91](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades/pull/91))
 
 ### Breaking changes
+
 - Requires `forge-std` version v1.9.5 or higher.
 
 ## 0.3.8 (2025-01-24)
@@ -23,6 +29,7 @@
 ## 0.3.5 (2024-09-20)
 
 ### Potentially breaking changes
+
 - Adds a check to ensure `initialOwner` for `deployTransparentProxy` is not a ProxyAdmin contract. ([#76](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades/pull/76))
 
 ## 0.3.4 (2024-09-16)
@@ -46,6 +53,7 @@
 - Adds library variations to support `forge coverage` or upgrade existing deployments using OpenZeppelin Contracts v4. ([#50](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades/pull/50))
 
 ### Breaking changes
+
 - Removed the `CHEATCODE_ADDRESS` internal constant from `Upgrades.sol`.
 
 ## 0.2.3 (2024-05-02)
@@ -65,6 +73,7 @@
 - Update forge-std to v1.8.0, restrict state mutability of some functions. ([#30](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades/pull/30))
 
 ### Breaking changes
+
 - Requires forge-std version v1.8.0 or later.
 
 ## 0.1.0 (2024-03-11)
@@ -79,6 +88,7 @@
 - Add functions to get approval process information from Defender ([#23](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades/pull/23))
 
 ### Breaking changes
+
 - `Defender.deployContract` functions now return `address` instead of `string`.
 - Defender deployments now require metadata to be included in compiler output.
 - Defender deployments no longer print console output on successful deployments.
