@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.4.2 (2025-05-07)
+
+- test2 ([#3](https://github.com/ericglau/openzeppelin-foundry-upgrades/pull/3))
+
 ## 0.4.1 (2025-05-07)
 
 - test change doc ([#1](https://github.com/ericglau/openzeppelin-foundry-upgrades/pull/1))
