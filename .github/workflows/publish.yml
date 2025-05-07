@@ -3,7 +3,7 @@ name: Publish Packages
 on:
   workflow_dispatch:
 
-concurrency: version-or-publish-${{ github.ref }}
+concurrency: publish-${{ github.ref }}
 
 jobs:
   publish:
